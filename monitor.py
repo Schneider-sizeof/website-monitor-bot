@@ -47,28 +47,17 @@ while True:
     for site in WEBSITES:
 
         current_status = check_website(site)
-        previous_status = status_cache.get(site)
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # First check
-        if previous_status is None:
-            status_cache[site] = current_status
-            print(f"[{timestamp}] {site} => {current_status}")
+        if current_status == "UP":
+            message = f"✅ WEBSITE WORKING\n\n{site}\n\nTime: {timestamp}"
 
-        # Status changed
-        elif previous_status != current_status:
+        else:
+            message = f"🚨 WEBSITE DOWN\n\n{site}\n\nTime: {timestamp}"
 
-            if current_status == "DOWN":
-                message = f"🚨 WEBSITE DOWN\n\n{site}\n\nTime: {timestamp}"
+        send_telegram_message(message)
 
-            else:
-                message = f"✅ WEBSITE BACK ONLINE\n\n{site}\n\nTime: {timestamp}"
-
-            send_telegram_message(message)
-
-            print(message)
-
-            status_cache[site] = current_status
+        print(message)
 
     time.sleep(CHECK_INTERVAL)
