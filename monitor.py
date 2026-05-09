@@ -50,14 +50,35 @@ while True:
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        if current_status == "UP":
-            message = f"✅ WEBSITE WORKING\n\n{site}\n\nTime: {timestamp}"
+        previous_status = status_cache.get(site)
 
-        else:
+        # First run
+        if previous_status is None:
+
+            status_cache[site] = current_status
+
+            print(f"{site} => {current_status}")
+
+            continue
+
+        # Website went DOWN
+        if previous_status == "UP" and current_status == "DOWN":
+
             message = f"🚨 WEBSITE DOWN\n\n{site}\n\nTime: {timestamp}"
 
-        send_telegram_message(message)
+            send_telegram_message(message)
 
-        print(message)
+            print(message)
+
+        # Website came BACK ONLINE
+        elif previous_status == "DOWN" and current_status == "UP":
+
+            message = f"✅ WEBSITE BACK ONLINE\n\n{site}\n\nTime: {timestamp}"
+
+            send_telegram_message(message)
+
+            print(message)
+
+        status_cache[site] = current_status
 
     time.sleep(CHECK_INTERVAL)
